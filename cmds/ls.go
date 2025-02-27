@@ -11,7 +11,7 @@ import (
 	"tinygo.org/x/tinyfs/littlefs"
 )
 
-var Ls *ffcli.Command = &ffcli.Command{
+var List *ffcli.Command = &ffcli.Command{
 	Name:       "ls",
 	ShortUsage: "littlefs ls <path>",
 	ShortHelp:  "List files on a littlefs filesystem.",

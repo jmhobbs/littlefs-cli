@@ -18,7 +18,15 @@ func main() {
 			fmt.Println(ffcli.DefaultUsageFunc(root))
 			return nil
 		},
-		Subcommands: []*ffcli.Command{cmds.Format, cmds.Ls, cmds.Tree, cmds.Cat, cmds.Cp, cmds.Mv, cmds.Rm},
+		Subcommands: []*ffcli.Command{
+			cmds.Cat,
+			cmds.Copy,
+			cmds.Format,
+			cmds.List,
+			cmds.Move,
+			cmds.Remove,
+			cmds.Tree,
+		},
 	}
 
 	if err := root.ParseAndRun(context.Background(), os.Args[1:]); err != nil {

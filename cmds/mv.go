@@ -6,7 +6,7 @@ import (
 	"github.com/peterbourgon/ff/v3/ffcli"
 )
 
-var Mv *ffcli.Command = &ffcli.Command{
+var Move *ffcli.Command = &ffcli.Command{
 	Name:       "mv",
 	ShortUsage: "littlefs mv <path> <path>",
 	ShortHelp:  "Move files to, from, or in a littlefs filesystem.",

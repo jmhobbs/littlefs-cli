@@ -10,7 +10,7 @@ import (
 	"tinygo.org/x/tinyfs/littlefs"
 )
 
-var Rm *ffcli.Command = &ffcli.Command{
+var Remove *ffcli.Command = &ffcli.Command{
 	Name:       "rm",
 	ShortUsage: "littlefs rm <path>",
 	ShortHelp:  "Remove files from a littlefs filesystem.",
@@ -25,11 +25,6 @@ var Rm *ffcli.Command = &ffcli.Command{
 		}
 
 		return lfs.WithReadWrite(file, func(fs *littlefs.LFS) error {
-			_, err := fs.Stat(file.VolumePath)
-			if err != nil {
-				return err
-			}
-
 			return fs.Remove(file.VolumePath)
 		})
 	},
