@@ -24,7 +24,7 @@ var Remove *ffcli.Command = &ffcli.Command{
 			return fmt.Errorf("littefs path required")
 		}
 
-		return lfs.WithReadWrite(file, func(fs *littlefs.LFS) error {
+		return lfs.WithReadWrite(file, *blockSize, *blocks, func(fs *littlefs.LFS) error {
 			return fs.Remove(file.VolumePath)
 		})
 	},

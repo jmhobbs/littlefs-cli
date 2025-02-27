@@ -38,7 +38,7 @@ var Copy *ffcli.Command = &ffcli.Command{
 
 			source = f
 		} else {
-			volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY)
+			volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY, *blockSize, *blocks)
 			if err != nil {
 				return err
 			}
@@ -58,7 +58,7 @@ var Copy *ffcli.Command = &ffcli.Command{
 
 			sink = f
 		} else {
-			volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE)
+			volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE, *blockSize, *blocks)
 			if err != nil {
 				return err
 			}
