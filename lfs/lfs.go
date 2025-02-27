@@ -6,11 +6,28 @@ import (
 	"github.com/jmhobbs/littlefs-cli/block"
 	"github.com/jmhobbs/littlefs-cli/path"
 
+	"tinygo.org/x/tinyfs"
 	"tinygo.org/x/tinyfs/littlefs"
 )
 
-func open(file path.Path, flag int) (*os.File, *littlefs.LFS, error) {
-	f, err := os.OpenFile(file.Path, flag, 0666)
+func OpenPath(file path.Path, flag int) (*os.File, *littlefs.LFS, tinyfs.File, error) {
+	volume, lfs, err := Open(file.Path, flag) // TODO: R or RW only here
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	f, err := lfs.OpenFile(file.VolumePath, flag)
+	if err != nil {
+		lfs.Unmount()
+		volume.Close()
+		return nil, nil, nil, err
+	}
+
+	return volume, lfs, f, nil
+}
+
+func Open(file string, flag int) (*os.File, *littlefs.LFS, error) {
+	f, err := os.OpenFile(file, flag, 0666)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -49,7 +66,7 @@ func WithReadWrite(file path.Path, cb WithLFSFunc) error {
 }
 
 func with(flag int, file path.Path, cb func(*littlefs.LFS) error) error {
-	f, lfs, err := open(file, flag)
+	f, lfs, err := Open(file.Path, flag)
 	if err != nil {
 		return err
 	}

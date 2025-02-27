@@ -13,7 +13,7 @@ type Path struct {
 	Type Type
 	// The path of the block device or file
 	Path string
-	// The path on a block device
+	// The path on a block device or disk
 	VolumePath string
 }
 
