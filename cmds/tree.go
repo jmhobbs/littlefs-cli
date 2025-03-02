@@ -20,6 +20,7 @@ var Tree *ffcli.Command = &ffcli.Command{
 	Name:       "tree",
 	ShortUsage: "littlefs tree <path>",
 	ShortHelp:  "Walk a littlefs filesystem and print a tree view.",
+	FlagSet:    commonFlagSet,
 	Exec: func(ctx context.Context, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("required 1 argument, got %d", len(args))
@@ -27,7 +28,7 @@ var Tree *ffcli.Command = &ffcli.Command{
 
 		file := path.Parse(args[0])
 
-		return lfs.WithReadOnly(file, *blockSize, *blocks, func(fs *littlefs.LFS) error {
+		return lfs.WithReadOnly(file, blockSize, blocks, func(fs *littlefs.LFS) error {
 			root := file.VolumePath
 
 			if !strings.HasSuffix(root, string(filepath.Separator)) {

@@ -16,6 +16,7 @@ var Copy *ffcli.Command = &ffcli.Command{
 	Name:       "cp",
 	ShortUsage: "littlefs cp <path> <path>",
 	ShortHelp:  "Copy files to, from, or on a littlefs filesystem.",
+	FlagSet:    commonFlagSet,
 	Exec: func(ctx context.Context, args []string) error {
 		if len(args) != 2 {
 			return fmt.Errorf("required 2 argument, got %d", len(args))
@@ -38,7 +39,7 @@ var Copy *ffcli.Command = &ffcli.Command{
 
 			source = f
 		} else {
-			volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY, *blockSize, *blocks)
+			volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY, blockSize, blocks)
 			if err != nil {
 				return err
 			}
@@ -58,7 +59,7 @@ var Copy *ffcli.Command = &ffcli.Command{
 
 			sink = f
 		} else {
-			volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE, *blockSize, *blocks)
+			volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE, blockSize, blocks)
 			if err != nil {
 				return err
 			}

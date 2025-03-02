@@ -1,20 +1,66 @@
 package block
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func OpenFileDevice(path string, blockSize, blockCount int64) (*FileDevice, error) {
-	f, err := os.OpenFile(path, os.O_RDWR, 0) // TODO: mode
+func CreateFileDevice(path string, blockSize, blockCount int64) (*FileDevice, error) {
+	if blockSize == 0 {
+		blockSize = 512
+	}
+	if blockCount == 0 {
+		return nil, fmt.Errorf("block count must be specified when creating an image")
+	}
+
+	f, err := os.Create(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// sensible defaults
+	// pre-allocate space
+	_, err = f.Seek((blockCount*blockSize)-1, 0)
+	if err != nil {
+		return nil, err
+	}
+	_, err = f.Write([]byte{0})
+	if err != nil {
+		return nil, err
+	}
+	_, err = f.Seek(0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	return &FileDevice{
+		file:      f,
+		blockSize: blockSize,
+		blocks:    blockCount,
+	}, nil
+}
+
+func OpenFileDevice(path string, blockSize, blockCount int64) (*FileDevice, error) {
+	f, err := os.OpenFile(path, os.O_RDWR, 0) // TODO: optional read only mode
+	if err != nil {
+		return nil, err
+	}
+
+	// sensible default
 	if blockSize == 0 {
 		blockSize = 512
 	}
 
 	if blockCount == 0 {
-		blockCount = 2048
+		fstat, err := f.Stat()
+		if err != nil {
+			f.Close()
+			return nil, err
+		}
+		if fstat.Size()%blockSize != 0 {
+			f.Close()
+			return nil, fmt.Errorf("file size %d is not a multiple of block size %d", fstat.Size(), blockSize)
+		}
+		blockCount = fstat.Size() / blockSize
 	}
 
 	return &FileDevice{
@@ -32,21 +78,6 @@ type FileDevice struct {
 
 func (b *FileDevice) Close() error {
 	return b.file.Close()
-}
-
-// todo: we should not do this unless it was a "create"
-func (b *FileDevice) Prepare() error {
-	// pre-allocate space
-	_, err := b.file.Seek((b.blocks-1)*b.blockSize, 0)
-	if err != nil {
-		return err
-	}
-	_, err = b.file.Write([]byte{0})
-	if err != nil {
-		return err
-	}
-	_, err = b.file.Seek(0, 0)
-	return err
 }
 
 func (bd *FileDevice) Size() int64 {

@@ -15,6 +15,7 @@ var List *ffcli.Command = &ffcli.Command{
 	Name:       "ls",
 	ShortUsage: "littlefs ls <path>",
 	ShortHelp:  "List files on a littlefs filesystem.",
+	FlagSet:    commonFlagSet,
 	Exec: func(ctx context.Context, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("required 1 argument, got %d", len(args))
@@ -22,7 +23,7 @@ var List *ffcli.Command = &ffcli.Command{
 
 		file := path.Parse(args[0])
 
-		return lfs.WithReadOnly(file, *blockSize, *blocks, func(fs *littlefs.LFS) error {
+		return lfs.WithReadOnly(file, blockSize, blocks, func(fs *littlefs.LFS) error {
 			lfsPath := file.VolumePath
 			if lfsPath == "" {
 				lfsPath = "/"

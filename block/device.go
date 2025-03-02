@@ -9,7 +9,6 @@ import (
 type Device interface {
 	tinyfs.BlockDevice
 
-	Prepare() error
 	Close() error
 }
 
@@ -18,8 +17,12 @@ func Open(path string, defaultBlockSize, defaultBlockCount int64) (Device, error
 	if strings.HasPrefix(path, "/dev/") {
 		return OpenHardwareDevice(path)
 	}
-
-	// todo: detect block count for images
-
 	return OpenFileDevice(path, defaultBlockSize, defaultBlockCount)
+}
+
+func Create(path string, blockSize, blockCount int64) (Device, error) {
+	if strings.HasPrefix(path, "/dev/") {
+		return OpenHardwareDevice(path)
+	}
+	return CreateFileDevice(path, blockSize, blockCount)
 }

@@ -40,10 +40,6 @@ func Open(file string, flag int, defaultBlockSize, defaultBlockCount int64) (blo
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := bd.Prepare(); err != nil {
-		bd.Close()
-		return nil, nil, err
-	}
 
 	lfs := littlefs.New(bd)
 	lfs.Configure(&littlefs.Config{
@@ -59,6 +55,35 @@ func Open(file string, flag int, defaultBlockSize, defaultBlockCount int64) (blo
 	}
 
 	return bd, lfs, nil
+}
+
+func Create(file string, defaultBlockSize, defaultBlockCount int64) error {
+	bd, err := block.Create(file, defaultBlockSize, defaultBlockCount)
+	if err != nil {
+		return err
+	}
+	lfs := littlefs.New(bd)
+	lfs.Configure(&littlefs.Config{
+		CacheSize:     512,
+		LookaheadSize: 512,
+		BlockCycles:   100,
+	})
+
+	err = lfs.Format()
+	if err != nil {
+		bd.Close()
+		return err
+	}
+
+	err = lfs.Mount()
+	if err != nil {
+		bd.Close()
+		return err
+	}
+	lfs.Unmount()
+	bd.Close()
+
+	return nil
 }
 
 type WithLFSFunc func(*littlefs.LFS) error

@@ -17,7 +17,7 @@ var Cat *ffcli.Command = &ffcli.Command{
 	Name:       "cat",
 	ShortUsage: "littlefs cat <path>",
 	ShortHelp:  "Output contents of a file on a littlefs filesystem.",
-	FlagSet:    rootFlagSet,
+	FlagSet:    commonFlagSet,
 	Exec: func(ctx context.Context, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("required 1 argument, got %d", len(args))
@@ -28,7 +28,7 @@ var Cat *ffcli.Command = &ffcli.Command{
 			return fmt.Errorf("littefs path required")
 		}
 
-		return lfs.WithReadOnly(file, *blockSize, *blocks, func(fs *littlefs.LFS) error {
+		return lfs.WithReadOnly(file, blockSize, blocks, func(fs *littlefs.LFS) error {
 			stat, err := fs.Stat(file.VolumePath)
 			if err != nil {
 				return err

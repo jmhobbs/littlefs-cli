@@ -14,6 +14,7 @@ var Remove *ffcli.Command = &ffcli.Command{
 	Name:       "rm",
 	ShortUsage: "littlefs rm <path>",
 	ShortHelp:  "Remove files from a littlefs filesystem.",
+	FlagSet:    commonFlagSet,
 	Exec: func(ctx context.Context, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("required 1 argument, got %d", len(args))
@@ -24,7 +25,7 @@ var Remove *ffcli.Command = &ffcli.Command{
 			return fmt.Errorf("littefs path required")
 		}
 
-		return lfs.WithReadWrite(file, *blockSize, *blocks, func(fs *littlefs.LFS) error {
+		return lfs.WithReadWrite(file, blockSize, blocks, func(fs *littlefs.LFS) error {
 			return fs.Remove(file.VolumePath)
 		})
 	},
