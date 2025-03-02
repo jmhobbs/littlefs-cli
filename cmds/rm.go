@@ -3,6 +3,7 @@ package cmds
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/jmhobbs/littlefs-cli/lfs"
 	"github.com/jmhobbs/littlefs-cli/path"
@@ -19,14 +20,15 @@ var Remove *ffcli.Command = &ffcli.Command{
 		if len(args) != 1 {
 			return fmt.Errorf("required 1 argument, got %d", len(args))
 		}
-		file := path.Parse(args[0])
-
-		if file.VolumePath == "" {
-			return fmt.Errorf("littefs path required")
-		}
-
-		return lfs.WithReadWrite(file, blockSize, blocks, func(fs *littlefs.LFS) error {
-			return fs.Remove(file.VolumePath)
-		})
+		return rm(path.Parse(args[0]))
 	},
+}
+
+func rm(file path.Path) error {
+	if file.VolumePath == "" {
+		return os.Remove(file.Path)
+	}
+	return lfs.WithReadWrite(file, blockSize, blocks, func(fs *littlefs.LFS) error {
+		return fs.Remove(file.VolumePath)
+	})
 }

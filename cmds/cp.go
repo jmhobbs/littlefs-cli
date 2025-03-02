@@ -25,52 +25,56 @@ var Copy *ffcli.Command = &ffcli.Command{
 		sourceFile := path.Parse(args[0])
 		targetFile := path.Parse(args[1])
 
-		var (
-			source io.Reader
-			sink   io.Writer
-		)
-
-		if sourceFile.VolumePath == "" {
-			f, err := os.Open(sourceFile.Path)
-			if err != nil {
-				return err
-			}
-			defer f.Close()
-
-			source = f
-		} else {
-			volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY, blockSize, blocks)
-			if err != nil {
-				return err
-			}
-			defer volume.Close()
-			defer lFS.Unmount()
-			defer f.Close()
-
-			source = f
-		}
-
-		if targetFile.VolumePath == "" {
-			f, err := os.Create(targetFile.Path)
-			if err != nil {
-				return err
-			}
-			defer f.Close()
-
-			sink = f
-		} else {
-			volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE, blockSize, blocks)
-			if err != nil {
-				return err
-			}
-			defer volume.Close()
-			defer lFS.Unmount()
-			defer f.Close()
-
-			sink = f
-		}
-
-		_, err := io.Copy(sink, source)
-		return err
+		return cp(sourceFile, targetFile)
 	},
+}
+
+func cp(sourceFile, targetFile path.Path) error {
+	var (
+		source io.Reader
+		sink   io.Writer
+	)
+
+	if sourceFile.VolumePath == "" {
+		f, err := os.Open(sourceFile.Path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		source = f
+	} else {
+		volume, lFS, f, err := lfs.OpenPath(sourceFile, os.O_RDONLY, blockSize, blocks)
+		if err != nil {
+			return err
+		}
+		defer volume.Close()
+		defer lFS.Unmount()
+		defer f.Close()
+
+		source = f
+	}
+
+	if targetFile.VolumePath == "" {
+		f, err := os.Create(targetFile.Path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		sink = f
+	} else {
+		volume, lFS, f, err := lfs.OpenPath(targetFile, os.O_RDWR|os.O_CREATE, blockSize, blocks)
+		if err != nil {
+			return err
+		}
+		defer volume.Close()
+		defer lFS.Unmount()
+		defer f.Close()
+
+		sink = f
+	}
+
+	_, err := io.Copy(sink, source)
+	return err
 }
