@@ -5,6 +5,10 @@
 
 This is a small command line tool for working with [littlefs](https://github.com/littlefs-project/littlefs) file systems.  It can work directly on block devices or on images.
 
+![Demo Screenshot](https://raw.githubusercontent.com/jmhobbs/littlefs-cli/refs/heads/main/.github/readme/demo.png)
+
+[Watch a demo](https://asciinema.org/a/705988)
+
 # Usage
 
 Paths for this tool are defined as `volume:path`, where `volume` can be a block device (i.e. `/dev/disk6`) or an image file (i.e. `~/image.lfs`).  The path is the path to a file on the littlefs file system.
